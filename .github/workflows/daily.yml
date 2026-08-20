@@ -1,0 +1,79 @@
+name: Daily schedule brief
+
+on:
+  schedule:
+    # GitHub cron is UTC and can fire well over an hour late. We bracket the DST cases
+    # (05:00/06:00 for 6am London, 17:00/18:00 for 6pm) and let run.py's tolerant window
+    # decide morning/evening; a cache marker makes sure each brief sends only once a day.
+    - cron: "0 5,6,17,18 * * *"
+  workflow_dispatch:
+    inputs:
+      which:
+        description: "Force morning or evening (manual test)"
+        required: false
+        default: "auto"
+        type: choice
+        options: [auto, morning, evening]
+
+# Serialize runs so the two bracketing crons can't race the dedupe cache.
+concurrency:
+  group: daily-brief
+  cancel-in-progress: false
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    env:
+      CANVAS_BASE_URL: ${{ secrets.CANVAS_BASE_URL }}
+      CANVAS_TOKEN: ${{ secrets.CANVAS_TOKEN }}
+      LBS_CALENDAR_URL: ${{ secrets.LBS_CALENDAR_URL }}
+      GOOGLE_CALENDAR_URL: ${{ secrets.GOOGLE_CALENDAR_URL }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TIMEZONE: Europe/London
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: Decide slot (morning/evening/none) + dedupe key
+        id: decide
+        run: |
+          MANUAL="${{ github.event.inputs.which }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "$MANUAL" ] && [ "$MANUAL" != "auto" ]; then
+            echo "slot=$MANUAL"   >> "$GITHUB_OUTPUT"   # manual test: always send, no dedupe
+            echo "dedupe=false"   >> "$GITHUB_OUTPUT"
+            echo "date=manual"    >> "$GITHUB_OUTPUT"
+          else
+            SLOT=$(python -c "from canvas_agent.run import current_slot; print(current_slot())")
+            DATE=$(python -c "from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo('Europe/London')).strftime('%Y-%m-%d'))")
+            echo "slot=$SLOT"     >> "$GITHUB_OUTPUT"
+            echo "dedupe=true"    >> "$GITHUB_OUTPUT"
+            echo "date=$DATE"     >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Already sent this brief today?
+        id: guard
+        if: steps.decide.outputs.slot != 'none' && steps.decide.outputs.dedupe == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .sent-marker
+          key: sent-${{ steps.decide.outputs.date }}-${{ steps.decide.outputs.slot }}
+          lookup-only: true
+
+      - name: Send brief
+        if: steps.decide.outputs.slot != 'none' && steps.guard.outputs.cache-hit != 'true'
+        run: python -m canvas_agent.run --which ${{ steps.decide.outputs.slot }}
+
+      - name: Record send marker
+        if: steps.decide.outputs.slot != 'none' && steps.decide.outputs.dedupe == 'true' && steps.guard.outputs.cache-hit != 'true'
+        run: date -u > .sent-marker
+
+      - name: Persist send marker
+        if: steps.decide.outputs.slot != 'none' && steps.decide.outputs.dedupe == 'true' && steps.guard.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .sent-marker
+          key: sent-${{ steps.decide.outputs.date }}-${{ steps.decide.outputs.slot }}
