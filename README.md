@@ -110,7 +110,7 @@ Gather these into a notes app for a minute. Each is a secret — don't share or 
 - **Copy it right away** (you can't see it again). Looks like `5886~AbCdEf...` — a number,
   a `~`, then a long string.
 
-> 📸 *Screenshot: the "New Access Token" button*
+<img width="1151" height="766" alt="Screenshot 2026-08-20 at 3 20 53 PM" src="https://github.com/user-attachments/assets/905cfdda-457d-4349-b8fa-72f3d18cd951" />
 
 **b) LBS calendar link** — your personal timetable feed.
 - Open the LBS calendar site → click **More options** (the `…`) → **Subscribe** →
