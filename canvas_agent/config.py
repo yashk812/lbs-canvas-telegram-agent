@@ -93,9 +93,9 @@ class EffortTier:
     lead_days: int
 
 
-LARGE = EffortTier("Large", 5)
-MEDIUM = EffortTier("Medium", 3)
-SMALL = EffortTier("Small", 1)
+MAJOR = EffortTier("Major", 5)
+MODERATE = EffortTier("Moderate", 3)
+MINOR = EffortTier("Minor", 1)
 
 # Effort heuristic, calibrated on real LBS data (points are ~always /100 or /1, and
 # description length is noisy, so neither is a reliable signal). What actually
@@ -103,12 +103,12 @@ SMALL = EffortTier("Small", 1)
 # heavy title keywords.
 #
 # Admin / click-through tasks (CV upload, feedback forms, GP registration, surveys):
-# these submission types imply no real deliverable -> Small (day-before nudge only).
+# these submission types imply no real deliverable -> Minor (day-before nudge only).
 ADMIN_SUBMISSION_TYPES = {"not_graded", "external_tool", "none", "on_paper", "not_applicable"}
-# A real graded deliverable at/above this many points -> Large.
-LARGE_POINTS = 50
-# Title keywords that mark a substantial piece of work -> Large regardless of points.
-HEAVY_KEYWORDS = (
+# A real graded deliverable at/above this many points -> Major.
+MAJOR_POINTS = 50
+# Title keywords that mark a substantial piece of work -> Major regardless of points.
+MAJOR_KEYWORDS = (
     "final", "take-home", "take home", "project", "report", "essay",
     "case", "dissertation", "exam", "presentation", "memo", "thesis",
 )

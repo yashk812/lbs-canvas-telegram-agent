@@ -13,7 +13,7 @@ from canvas_agent.assignments import Assignment, status_of, surface_assignments 
 LON = ZoneInfo("Europe/London")
 
 
-def _a(due_iso: str, tier=config.LARGE, submitted=False, late=False) -> Assignment:
+def _a(due_iso: str, tier=config.MAJOR, submitted=False, late=False) -> Assignment:
     due = datetime.fromisoformat(due_iso).astimezone(LON)
     return Assignment("A", "C", due, 1, 1, 100, tier, submitted, late)
 
@@ -50,7 +50,7 @@ def test_surface_includes_overdue_and_today_submitted_excludes_old():
     done_today = _a("2026-08-16T09:00:00+01:00", submitted=True)  # today, done -> show
     done_old = _a("2026-08-10T09:00:00+01:00", submitted=True)    # last week, done -> hide
     upcoming = _a("2026-08-19T16:00:00+01:00")                    # in lead window -> show
-    far = _a("2026-09-30T16:00:00+01:00", tier=config.SMALL)      # beyond lead -> hide
+    far = _a("2026-09-30T16:00:00+01:00", tier=config.MINOR)      # beyond lead -> hide
     out = surface_assignments([missed, done_today, done_old, upcoming, far], now)
     assert missed in out and done_today in out and upcoming in out
     assert done_old not in out and far not in out

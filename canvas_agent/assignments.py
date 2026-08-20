@@ -77,21 +77,21 @@ def _absolute_url(html_url: str | None) -> str | None:
 def estimate_effort(points: float | None, title: str, submission_types: list[str]) -> config.EffortTier:
     """Map an assignment to an effort tier (=> how many days ahead to warn).
 
-    Signal priority: submission type first (admin click-throughs are Small no matter
-    what), then heavy title keywords / high points mark a real Large deliverable,
-    everything else with a genuine upload/text submission is Medium.
+    Signal priority: submission type first (admin click-throughs are Minor no matter
+    what), then heavy title keywords / high points mark a real Major deliverable,
+    everything else with a genuine upload/text submission is Moderate.
     """
     types = {t for t in (submission_types or [])}
     if not types or types <= config.ADMIN_SUBMISSION_TYPES:
-        return config.SMALL
+        return config.MINOR
     # word-boundary match so "Finalised" doesn't trip the "final" keyword
     t = (title or "").lower().replace("-", " ")
     heavy = any(
-        re.search(rf"\b{re.escape(k.replace('-', ' '))}\b", t) for k in config.HEAVY_KEYWORDS
+        re.search(rf"\b{re.escape(k.replace('-', ' '))}\b", t) for k in config.MAJOR_KEYWORDS
     )
-    if (points or 0) >= config.LARGE_POINTS or heavy:
-        return config.LARGE
-    return config.MEDIUM
+    if (points or 0) >= config.MAJOR_POINTS or heavy:
+        return config.MAJOR
+    return config.MODERATE
 
 
 def extract_assignments(planner_items: list[dict], client: CanvasClient) -> list[Assignment]:
@@ -119,7 +119,7 @@ def extract_assignments(planner_items: list[dict], client: CanvasClient) -> list
             points = detail.get("points_possible", points)
             sub_types = detail.get("submission_types") or []
         except Exception:
-            pass  # fall back to planner fields / Small tier
+            pass  # fall back to planner fields / Minor tier
         out.append(
             Assignment(
                 title=title,

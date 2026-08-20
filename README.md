@@ -37,7 +37,7 @@ Understanding General Management · Session 1 — The Challenge
 📚 Assignments
 • 🔴 Individual Assignment 1 — OVERDUE — was due 08:15
 • 🟠 Your LBS CV — due tomorrow 12:00
-• 🟢 Individual Assignment 2 — due Wed 16:00 · in 3d · Large
+• 🟢 Individual Assignment 2 — due Wed 16:00 · in 3d · Major
 ```
 
 ### Features
@@ -88,58 +88,105 @@ Secrets live only in GitHub Actions secrets — never in the code.
 
 ---
 
-## Setup (about 15 minutes)
+## Setup — no coding required (~15 min)
 
-### 1. Use this template
-Click **Use this template** (or fork), then clone your copy.
+You don't need to know how to code. It runs on GitHub's servers; you just paste in a few
+personal keys. (A "run it on your laptop" path for tinkerers is at the very bottom.)
 
-### 2. Get your credentials
+### Step 1 — Make your own copy
+Click the green **Use this template** button at the top of this page → **Create a new
+repository** → give it a name (e.g. `my-lbs-brief`) → **Create repository**. You now have
+your own copy under your GitHub account.
 
-<details><summary><b>Canvas access token</b></summary>
+> 📸 *Screenshot: the "Use this template" button (see [Adding screenshots](#-adding-screenshots) to contribute one)*
 
-On `learning.london.edu`: **Account → Settings → Approved Integrations → + New Access
-Token**. Copy it now (you can't see it again). Treat it like a password.
-</details>
+### Step 2 — Collect your keys
+Gather these into a notes app for a minute. Each is a secret — don't share or post them.
 
-<details><summary><b>LBS Live Calendar feed URL</b></summary>
+**a) Canvas access token** — proves it's you to Canvas.
+- Go to **learning.london.edu** → click your avatar → **Settings**.
+- Scroll to **Approved Integrations** → **+ New Access Token** → purpose "daily brief" →
+  **Generate Token**.
+- **Copy it right away** (you can't see it again). Looks like `5886~AbCdEf...` — a number,
+  a `~`, then a long string.
 
-On the LBS calendar site, find **Subscribe / Calendar feed** and copy the personal
-`https://lbscalendar.london.edu/api/student/subscription/…` URL. It's secret — anyone
-with it can read your calendar.
-</details>
+> 📸 *Screenshot: the "New Access Token" button*
 
-<details><summary><b>Telegram bot + chat id</b></summary>
+**b) LBS calendar link** — your personal timetable feed.
+- Open the LBS calendar site → click **More options** (the `…`) → **Subscribe** →
+  **copy the link**.
+- Looks like `https://lbscalendar.london.edu/api/student/subscription/xxxxxxxx-...`
 
-1. In Telegram, message **@BotFather** → `/newbot` → copy the bot token.
-2. Send your new bot any message (e.g. "hi").
-3. Run `python scripts/get_chat_id.py` (with `TELEGRAM_BOT_TOKEN` set) → it prints your
-   chat id.
-</details>
+> 📸 *Screenshot: More options → Subscribe*
 
-<details><summary><b>Google Calendar feed (optional)</b></summary>
+**c) Telegram bot token** — your own bot.
+- In Telegram, search **@BotFather** → send `/newbot` → follow the prompts (a name, then a
+  username ending in `bot`).
+- It replies with a token like `8845113781:AAH9E9...` — digits, a colon, a long string. Copy it.
 
-Google Calendar (web) → the calendar's **Settings and sharing → Integrate calendar →
-"Secret address in iCal format"** (the `private-…` one, *not* Public).
-</details>
+**d) Telegram chat ID** — so the bot messages *you*.
+- Send your new bot any message (e.g. "hi") in Telegram.
+- In a web browser, open this (paste your bot token where shown, keep the word `bot` in front):
+  `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+- In the text that appears, find `"chat":{"id":123456789` — that number is your chat ID
+  (just digits, occasionally with a leading `-`).
 
-### 3. Try it locally
-```bash
-pip install -r requirements.txt
-cp .env.example .env        # then fill in your values
-python -m canvas_agent.run --which evening --dry-run   # prints, doesn't send
-python -m canvas_agent.run --which morning              # actually sends
-pytest                                                  # run the tests
-```
+**e) Google Calendar link** *(optional)* — to fold in personal events.
+- Google Calendar on a computer → hover your calendar → **⋮ → Settings and sharing →
+  Integrate calendar** → copy **Secret address in iCal format** (the `.../private-.../basic.ics`
+  one — **not** the public one).
 
-### 4. Deploy on GitHub Actions
-1. Push your repo to GitHub.
-2. **Settings → Secrets and variables → Actions** → add each as a secret:
-   `CANVAS_BASE_URL`, `CANVAS_TOKEN`, `LBS_CALENDAR_URL`, `TELEGRAM_BOT_TOKEN`,
-   `TELEGRAM_CHAT_ID`, and optionally `GOOGLE_CALENDAR_URL`, `SEATING_STREAM`.
-3. **Actions** tab → enable workflows → run **Daily schedule brief** manually
-   (`workflow_dispatch`) to test. The cron then runs automatically.
+### Step 3 — Paste the keys into GitHub ("Secrets")
+This is where your keys live — encrypted, never shown in the code.
 
-That's it — £0, and it survives your laptop being closed.
+1. In **your** repo → **Settings** (top tab) → **Secrets and variables → Actions** (left).
+2. Click **New repository secret**, then add each row below (Name exactly as written,
+   Secret = your value). Repeat for each.
+
+| Name (type exactly) | Value | Required |
+|---|---|---|
+| `CANVAS_BASE_URL` | `https://learning.london.edu` | ✅ |
+| `CANVAS_TOKEN` | your Canvas token (`5886~...`) | ✅ |
+| `LBS_CALENDAR_URL` | your calendar link | ✅ |
+| `TELEGRAM_BOT_TOKEN` | your bot token (`8845...:AAH...`) | ✅ |
+| `TELEGRAM_CHAT_ID` | your chat ID (digits) | ✅ |
+| `GOOGLE_CALENDAR_URL` | your Google secret link | optional |
+| `SEATING_STREAM` | your stream, e.g. `Stream C` (MBA only) | optional |
+
+**Format rules — get these right:**
+- Paste the value **raw**: no surrounding quotes, no spaces before/after, nothing extra.
+- Names are **case-sensitive** — copy them exactly (all caps, underscores).
+- `CANVAS_BASE_URL` has **no** trailing slash. `TELEGRAM_CHAT_ID` is **just the number**.
+
+> 📸 *Screenshot: the "New repository secret" form*
+
+### Step 4 — Turn it on
+1. Open the **Actions** tab of your repo → if asked, click **"I understand my workflows,
+   go ahead and enable them"** (GitHub pauses workflows on new copies by default).
+2. Click **Daily schedule brief** (left) → **Run workflow** (right) → choose **evening** →
+   **Run workflow**.
+3. Wait ~1 minute, then check Telegram — you should get a brief! 🎉
+
+From now on it runs itself at **6am and 6pm London**, every day, no laptop needed. £0.
+
+### Troubleshooting
+- **No message?** Actions tab → open the latest run → look for a red ✗ and read the error.
+- **"Missing required environment variables"** → a required secret is missing or misspelled
+  (names are case-sensitive).
+- **Manual test worked but nothing at 6am** → GitHub's scheduler can run a few minutes late;
+  it still sends once. Give it a day.
+
+---
+
+## 📸 Adding screenshots
+
+Screenshots make this guide far easier to follow — contributions welcome! The easiest way:
+1. Take the screenshot (blur out anything personal).
+2. On GitHub, open `README.md` and click the **✏️ pencil** to edit → **drag your image file
+   straight into the text box**. GitHub uploads it and inserts the link automatically.
+3. Drop it where you see a `📸 Screenshot: …` line, and delete that placeholder line.
+
+(Or add files under `docs/images/` and reference them as `![caption](docs/images/name.png)`.)
 
 ---
 
@@ -152,6 +199,25 @@ plus the tolerant window in [`canvas_agent/run.py`](canvas_agent/run.py).
 
 **Seating charts** are MBA-specific and optional — set `SEATING_STREAM` to your stream
 (e.g. `Stream C`) to enable them; leave it blank and everything else still works.
+
+## Optional: run it on your laptop
+
+Only needed if you want to change the code. Requires **Python 3.10+**.
+
+```bash
+git clone https://github.com/<your-username>/<your-repo>.git
+cd <your-repo>
+pip install -r requirements.txt
+cp .env.example .env      # then open .env and fill in your keys (see below)
+python -m canvas_agent.run --which evening --dry-run   # prints the brief, doesn't send
+python -m canvas_agent.run --which evening              # actually sends to Telegram
+pytest                                                  # run the tests
+```
+
+The `.env` file holds the **same keys** as your GitHub Secrets, one per line, `KEY=value`
+with **no quotes** — e.g. `CANVAS_TOKEN=5886~AbCd...`. It's gitignored, so it never gets
+committed. This laptop path only runs while your laptop is on — GitHub Actions is what
+makes it reliable.
 
 ## Reliability notes
 

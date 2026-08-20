@@ -105,11 +105,11 @@ def test_meal_advice_stuck_through_lunch():
 
 
 def test_effort_tiers():
-    assert estimate_effort(100, "Complete the Right to Study Check", ["external_tool"]).name == "Small"
-    assert estimate_effort(None, "Your LBS CV", ["not_graded"]).name == "Small"
-    assert estimate_effort(1, "Post GLAM Survey", ["none"]).name == "Small"
-    assert estimate_effort(100, "Individual Assignment 2", ["online_upload"]).name == "Large"
-    assert estimate_effort(20, "Final day Group Project", ["online_upload"]).name == "Large"
-    assert estimate_effort(0, "Final Take-Home Assignment", ["online_upload"]).name == "Large"
-    # genuine upload, no heavy keyword/points -> Medium; "Finalised" must not trip "final"
-    assert estimate_effort(1, "Finalised Team Agreement", ["online_upload"]).name == "Medium"
+    assert estimate_effort(100, "Complete the Right to Study Check", ["external_tool"]).name == "Minor"
+    assert estimate_effort(None, "Your LBS CV", ["not_graded"]).name == "Minor"
+    assert estimate_effort(1, "Post GLAM Survey", ["none"]).name == "Minor"
+    assert estimate_effort(100, "Individual Assignment 2", ["online_upload"]).name == "Major"
+    assert estimate_effort(20, "Final day Group Project", ["online_upload"]).name == "Major"
+    assert estimate_effort(0, "Final Take-Home Assignment", ["online_upload"]).name == "Major"
+    # genuine upload, no heavy keyword/points -> Moderate; "Finalised" must not trip "final"
+    assert estimate_effort(1, "Finalised Team Agreement", ["online_upload"]).name == "Moderate"
