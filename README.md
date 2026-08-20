@@ -98,8 +98,6 @@ Click the green **Use this template** button at the top of this page → **Creat
 repository** → give it a name (e.g. `my-lbs-brief`) → **Create repository**. You now have
 your own copy under your GitHub account.
 
-> 📸 *Screenshot: the "Use this template" button (see [Adding screenshots](#-adding-screenshots) to contribute one)*
-
 ### Step 2 — Collect your keys
 Gather these into a notes app for a minute. Each is a secret — don't share or post them.
 
@@ -114,8 +112,6 @@ Gather these into a notes app for a minute. Each is a secret — don't share or 
 - Open the LBS calendar site → click **More options** (the `…`) → **Subscribe** →
   **copy the link**.
 - Looks like `https://lbscalendar.london.edu/api/student/subscription/xxxxxxxx-...`
-
-> 📸 *Screenshot: More options → Subscribe*
 
 **c) Telegram bot token** — your own bot.
 - In Telegram, search **@BotFather** → send `/newbot` → follow the prompts (a name, then a
@@ -156,8 +152,6 @@ This is where your keys live — encrypted, never shown in the code.
 - Names are **case-sensitive** — copy them exactly (all caps, underscores).
 - `CANVAS_BASE_URL` has **no** trailing slash. `TELEGRAM_CHAT_ID` is **just the number**.
 
-> 📸 *Screenshot: the "New repository secret" form*
-
 ### Step 4 — Turn it on
 1. Open the **Actions** tab of your repo → if asked, click **"I understand my workflows,
    go ahead and enable them"** (GitHub pauses workflows on new copies by default).
@@ -173,18 +167,6 @@ From now on it runs itself at **6am and 6pm London**, every day, no laptop neede
   (names are case-sensitive).
 - **Manual test worked but nothing at 6am** → GitHub's scheduler can run a few minutes late;
   it still sends once. Give it a day.
-
----
-
-## 📸 Adding screenshots
-
-Screenshots make this guide far easier to follow — contributions welcome! The easiest way:
-1. Take the screenshot (blur out anything personal).
-2. On GitHub, open `README.md` and click the **✏️ pencil** to edit → **drag your image file
-   straight into the text box**. GitHub uploads it and inserts the link automatically.
-3. Drop it where you see a `📸 Screenshot: …` line, and delete that placeholder line.
-
-(Or add files under `docs/images/` and reference them as `![caption](docs/images/name.png)`.)
 
 ---
 
