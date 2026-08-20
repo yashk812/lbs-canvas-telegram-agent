@@ -99,58 +99,65 @@ repository** → give it a name (e.g. `my-lbs-brief`) → **Create repository**.
 your own copy under your GitHub account.
 
 ### Step 2 — Collect your keys
-Gather these into a notes app for a minute. Each is a secret — don't share or post them.
+Do these in your **web browser** (except Telegram, which is the **phone app**). Gather the
+values into a notes app. Each is a secret — don't share or post them.
 
 **a) Canvas access token** — proves it's you to Canvas.
-- Go to **learning.london.edu** → click your avatar → **Settings**.
+- Go to [learning.london.edu](https://learning.london.edu) → click your avatar → **Settings**.
 - Scroll to **Approved Integrations** → **+ New Access Token** → purpose "daily brief" →
   **Generate Token**.
 - **Copy it right away** (you can't see it again). Looks like `5886~AbCdEf...` — a number,
   a `~`, then a long string.
 
 **b) LBS calendar link** — your personal timetable feed.
-- Open the LBS calendar site → click **More options** (the `…`) → **Subscribe** →
-  **copy the link**.
+- Go to the [LBS calendar site](https://lbscalendar.london.edu) → click **More options**
+  (the `…`) → **Subscribe** → **copy the link**.
 - Looks like `https://lbscalendar.london.edu/api/student/subscription/xxxxxxxx-...`
 
-**c) Telegram bot token** — your own bot.
-- In Telegram, search **@BotFather** → send `/newbot` → follow the prompts (a name, then a
-  username ending in `bot`).
-- It replies with a token like `8845113781:AAH9E9...` — digits, a colon, a long string. Copy it.
+**c) Telegram bot token** — 📱 *in the Telegram phone app*.
+- Install **Telegram** on your phone if you haven't. Open the app → tap the search icon →
+  find **[@BotFather](https://t.me/BotFather)** (it has a blue tick).
+- Send it `/newbot` → follow the prompts (a name, then a username ending in `bot`).
+- BotFather replies with a token like `8845113781:AAH9E9...`. Tap it to copy.
 
 **d) Telegram chat ID** — so the bot messages *you*.
-- Send your new bot any message (e.g. "hi") in Telegram.
-- In a web browser, open this (paste your bot token where shown, keep the word `bot` in front):
+- 📱 In the Telegram app, open your new bot and send it any message (e.g. "hi").
+- Then in your **browser**, open this address — replace `<YOUR_BOT_TOKEN>` with your token,
+  keeping the word `bot` in front:
   `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
-- In the text that appears, find `"chat":{"id":123456789` — that number is your chat ID
-  (just digits, occasionally with a leading `-`).
+- On that page find `"chat":{"id":123456789` — that number is your chat ID (just digits,
+  occasionally with a leading `-`).
 
 **e) Google Calendar link** *(optional)* — to fold in personal events.
-- Google Calendar on a computer → hover your calendar → **⋮ → Settings and sharing →
-  Integrate calendar** → copy **Secret address in iCal format** (the `.../private-.../basic.ics`
-  one — **not** the public one).
+- In your browser at [Google Calendar](https://calendar.google.com) → hover your calendar →
+  **⋮ → Settings and sharing → Integrate calendar** → copy **Secret address in iCal format**
+  (the `.../private-.../basic.ics` one — **not** the public one).
 
-### Step 3 — Paste the keys into GitHub ("Secrets")
-This is where your keys live — encrypted, never shown in the code.
+### Step 3 — Add everything as ONE secret
+No fiddly list of field names to remember — you paste a single block.
 
-1. In **your** repo → **Settings** (top tab) → **Secrets and variables → Actions** (left).
-2. Click **New repository secret**, then add each row below (Name exactly as written,
-   Secret = your value). Repeat for each.
+1. Copy the block below into a notes app and fill in each value after the `=`
+   (leave a line blank if you're not using it — don't change the names on the left):
 
-| Name (type exactly) | Value | Required |
-|---|---|---|
-| `CANVAS_BASE_URL` | `https://learning.london.edu` | ✅ |
-| `CANVAS_TOKEN` | your Canvas token (`5886~...`) | ✅ |
-| `LBS_CALENDAR_URL` | your calendar link | ✅ |
-| `TELEGRAM_BOT_TOKEN` | your bot token (`8845...:AAH...`) | ✅ |
-| `TELEGRAM_CHAT_ID` | your chat ID (digits) | ✅ |
-| `GOOGLE_CALENDAR_URL` | your Google secret link | optional |
-| `SEATING_STREAM` | your stream, e.g. `Stream C` (MBA only) | optional |
+   ```
+   CANVAS_BASE_URL=https://learning.london.edu
+   CANVAS_TOKEN=
+   LBS_CALENDAR_URL=
+   TELEGRAM_BOT_TOKEN=
+   TELEGRAM_CHAT_ID=
+   GOOGLE_CALENDAR_URL=
+   SEATING_STREAM=
+   ```
 
-**Format rules — get these right:**
-- Paste the value **raw**: no surrounding quotes, no spaces before/after, nothing extra.
-- Names are **case-sensitive** — copy them exactly (all caps, underscores).
-- `CANVAS_BASE_URL` has **no** trailing slash. `TELEGRAM_CHAT_ID` is **just the number**.
+2. In **your** repo (in the browser), open **Settings → Secrets and variables → Actions**.
+   *Tip: open it in a new browser tab so this guide stays put.* Click **New repository secret**.
+3. **Name:** type `DOTENV`. **Secret:** paste your whole filled-in block. Click **Add secret**.
+
+**Notes:**
+- Fill in only the part **after** each `=`. No quotes, no extra spaces.
+- `SEATING_STREAM` (LBS MBA only): your stream written in full, e.g. `Stream E`. Leave blank
+  if you're not MBA or don't want seating links.
+- `GOOGLE_CALENDAR_URL` is optional — leave it blank to skip it.
 
 ### Step 4 — Turn it on
 1. Open the **Actions** tab of your repo → if asked, click **"I understand my workflows,
@@ -163,8 +170,10 @@ From now on it runs itself at **6am and 6pm London**, every day, no laptop neede
 
 ### Troubleshooting
 - **No message?** Actions tab → open the latest run → look for a red ✗ and read the error.
-- **"Missing required environment variables"** → a required secret is missing or misspelled
-  (names are case-sensitive).
+- **"DOTENV secret not set / incomplete"** → your `DOTENV` secret is missing a required line
+  (`CANVAS_TOKEN`, `LBS_CALENDAR_URL`, or the Telegram ones). Edit the secret and re-run.
+- **Wrong values?** Just edit the single `DOTENV` secret (Settings → Secrets → `DOTENV` →
+  update) — no need to hunt through several secrets.
 - **Manual test worked but nothing at 6am** → GitHub's scheduler can run a few minutes late;
   it still sends once. Give it a day.
 
@@ -194,8 +203,8 @@ python -m canvas_agent.run --which evening              # actually sends to Tele
 pytest                                                  # run the tests
 ```
 
-The `.env` file holds the **same keys** as your GitHub Secrets, one per line, `KEY=value`
-with **no quotes** — e.g. `CANVAS_TOKEN=5886~AbCd...`. It's gitignored, so it never gets
+The `.env` file is exactly the block you put in the `DOTENV` secret — one `KEY=value` per
+line, **no quotes** (e.g. `CANVAS_TOKEN=5886~AbCd...`). It's gitignored, so it never gets
 committed. This laptop path only runs while your laptop is on — GitHub Actions is what
 makes it reliable.
 

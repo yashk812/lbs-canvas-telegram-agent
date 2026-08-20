@@ -23,14 +23,6 @@ concurrency:
 jobs:
   brief:
     runs-on: ubuntu-latest
-    env:
-      CANVAS_BASE_URL: ${{ secrets.CANVAS_BASE_URL }}
-      CANVAS_TOKEN: ${{ secrets.CANVAS_TOKEN }}
-      LBS_CALENDAR_URL: ${{ secrets.LBS_CALENDAR_URL }}
-      GOOGLE_CALENDAR_URL: ${{ secrets.GOOGLE_CALENDAR_URL }}
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      TIMEZONE: Europe/London
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,12 +30,20 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
 
+      # All your keys live in ONE secret named DOTENV (see the README). We write it to
+      # a .env file the app reads. It's on the throwaway runner only, never committed.
+      - name: Write .env from the DOTENV secret
+        env:
+          DOTENV: ${{ secrets.DOTENV }}
+        run: printf '%s\n' "$DOTENV" > .env
+
       - name: Decide slot (morning/evening/none) + dedupe key
         id: decide
         run: |
           # Not configured yet (e.g. the fresh template)? No-op cleanly instead of failing.
-          if [ -z "$CANVAS_TOKEN" ] || [ -z "$TELEGRAM_BOT_TOKEN" ]; then
-            echo "Secrets not configured — skipping. Add repo secrets to enable."
+          CONFIGURED=$(python -c "from canvas_agent.config import settings as s; print('1' if (s.canvas_token and s.telegram_bot_token and s.lbs_calendar_url) else '')")
+          if [ -z "$CONFIGURED" ]; then
+            echo "DOTENV secret not set / incomplete — skipping. Add it to enable."
             echo "slot=none" >> "$GITHUB_OUTPUT"; echo "dedupe=false" >> "$GITHUB_OUTPUT"; echo "date=na" >> "$GITHUB_OUTPUT"
             exit 0
           fi
