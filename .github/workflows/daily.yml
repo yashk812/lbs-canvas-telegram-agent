@@ -41,6 +41,12 @@ jobs:
       - name: Decide slot (morning/evening/none) + dedupe key
         id: decide
         run: |
+          # Not configured yet (e.g. the fresh template)? No-op cleanly instead of failing.
+          if [ -z "$CANVAS_TOKEN" ] || [ -z "$TELEGRAM_BOT_TOKEN" ]; then
+            echo "Secrets not configured — skipping. Add repo secrets to enable."
+            echo "slot=none" >> "$GITHUB_OUTPUT"; echo "dedupe=false" >> "$GITHUB_OUTPUT"; echo "date=na" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           MANUAL="${{ github.event.inputs.which }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "$MANUAL" ] && [ "$MANUAL" != "auto" ]; then
             echo "slot=$MANUAL"   >> "$GITHUB_OUTPUT"   # manual test: always send, no dedupe
