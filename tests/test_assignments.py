@@ -8,7 +8,9 @@ from zoneinfo import ZoneInfo
 os.environ.setdefault("TIMEZONE", "Europe/London")
 
 from canvas_agent import config  # noqa: E402
-from canvas_agent.assignments import Assignment, status_of, surface_assignments  # noqa: E402
+from canvas_agent.assignments import (  # noqa: E402
+    Assignment, extract_assignments, status_of, surface_assignments,
+)
 
 LON = ZoneInfo("Europe/London")
 
@@ -16,6 +18,29 @@ LON = ZoneInfo("Europe/London")
 def _a(due_iso: str, tier=config.MAJOR, submitted=False, late=False) -> Assignment:
     due = datetime.fromisoformat(due_iso).astimezone(LON)
     return Assignment("A", "C", due, 1, 1, 100, tier, submitted, late)
+
+
+def test_quiz_item_is_included_as_minor():
+    # a Canvas quiz ("Concept Check") arrives via the planner as plannable_type "quiz",
+    # not "assignment" — it must still be picked up, without hitting the assignment endpoint.
+    class _Client:
+        def assignment_detail(self, *a):
+            raise AssertionError("quizzes must not call the assignment detail endpoint")
+
+    items = [{
+        "plannable_type": "quiz", "course_id": 12542,
+        "submissions": {"submitted": False, "late": False},
+        "plannable_date": "2026-08-21T11:00:00Z",
+        "plannable": {"id": 10167, "title": "Concept Check 1", "points_possible": 18.0, "due_at": None},
+        "html_url": "/courses/12542/quizzes/10167",
+        "context_name": "C170   AUT26 Data Analytics For Managers",
+    }]
+    out = extract_assignments(items, _Client())
+    assert len(out) == 1
+    assert out[0].title == "Concept Check 1"
+    assert out[0].tier.name == "Minor"          # a concept-check quiz is quick
+    assert "quizzes/10167" in out[0].url
+    assert out[0].course == "Data Analytics For Managers"
 
 
 def test_status_submitted():

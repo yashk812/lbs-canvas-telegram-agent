@@ -94,14 +94,20 @@ def estimate_effort(points: float | None, title: str, submission_types: list[str
     return config.MODERATE
 
 
+# Planner types that represent something *due* (vs announcements, calendar events, notes).
+DUE_TYPES = {"assignment", "quiz", "discussion_topic"}
+
+
 def extract_assignments(planner_items: list[dict], client: CanvasClient) -> list[Assignment]:
-    """Build Assignment objects from planner items, enriching each with effort."""
+    """Build Assignment objects from planner due-items — assignments, quizzes (e.g.
+    "Concept Check"), and graded discussions — enriching each with effort."""
     out: list[Assignment] = []
     for item in planner_items:
-        if item.get("plannable_type") != "assignment":
+        ptype = item.get("plannable_type")
+        if ptype not in DUE_TYPES:
             continue
         p = item.get("plannable", {})
-        # LBS assignments often have a null due_at but a valid item-level plannable_date.
+        # LBS items often have a null due_at but a valid item-level plannable_date.
         due_raw = p.get("due_at") or item.get("plannable_date")
         if not due_raw:
             continue
@@ -109,32 +115,47 @@ def extract_assignments(planner_items: list[dict], client: CanvasClient) -> list
         submitted = bool(subs.get("submitted") or subs.get("excused") or subs.get("graded"))
         late = bool(subs.get("late"))
         course_id = item.get("course_id")
-        assignment_id = p.get("id")
-        title = (p.get("title") or "Assignment").strip()
-        # submission_types lives only on the full assignment; points too (more reliably).
+        plannable_id = p.get("id")
+        title = (p.get("title") or ptype.replace("_", " ").title()).strip()
         points = p.get("points_possible")
         sub_types: list[str] = []
-        try:
-            detail = client.assignment_detail(course_id, assignment_id)
-            points = detail.get("points_possible", points)
-            sub_types = detail.get("submission_types") or []
-        except Exception:
-            pass  # fall back to planner fields / Minor tier
+        # submission_types only exists on full assignments; quizzes/discussions skip it
+        # (their detail lives at a different endpoint, and would 404 here).
+        if ptype == "assignment":
+            try:
+                detail = client.assignment_detail(course_id, plannable_id)
+                points = detail.get("points_possible", points)
+                sub_types = detail.get("submission_types") or []
+            except Exception:
+                pass  # fall back to planner fields
         out.append(
             Assignment(
                 title=title,
                 course=_short_course(item.get("context_name", "")),
                 due=_parse_utc_local(due_raw),
                 course_id=course_id,
-                assignment_id=assignment_id,
+                assignment_id=plannable_id,
                 points=points,
-                tier=estimate_effort(points, title, sub_types),
+                tier=_tier_for(ptype, title, points, sub_types),
                 submitted=submitted,
                 late=late,
                 url=_absolute_url(item.get("html_url")),
             )
         )
     return out
+
+
+def _tier_for(ptype: str, title: str, points: float | None, sub_types: list[str]) -> config.EffortTier:
+    """Effort tier by item type. Assignments use the full heuristic; quizzes and graded
+    discussions are treated as quick (Minor) unless a heavy keyword or high points mark
+    them as a real Major piece (e.g. a 'Final Exam' quiz)."""
+    if ptype == "assignment":
+        return estimate_effort(points, title, sub_types)
+    t = (title or "").lower().replace("-", " ")
+    heavy = any(re.search(rf"\b{re.escape(k.replace('-', ' '))}\b", t) for k in config.MAJOR_KEYWORDS)
+    if heavy or (points or 0) >= config.MAJOR_POINTS:
+        return config.MAJOR
+    return config.MINOR
 
 
 def surface_assignments(assignments: list[Assignment], now: datetime) -> list[Assignment]:
