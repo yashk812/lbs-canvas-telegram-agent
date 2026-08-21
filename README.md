@@ -121,12 +121,16 @@ values into a notes app. Each is a secret — don't share or post them.
 - BotFather replies with a token like `8845113781:AAH9E9...`. Tap it to copy.
 
 **d) Telegram chat ID** — so the bot messages *you*.
-- 📱 **Easiest:** in the Telegram app, search **[@userinfobot](https://t.me/userinfobot)**,
-  open it, and tap **Start**. It instantly replies with your numeric **Id** — that's your
-  chat ID (just digits).
-- *Alternative (no extra bot):* message your own bot once, then open
-  `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates` in a browser (replace the token,
-  keep `bot` in front) and find `"chat":{"id":123456789`.
+1. 📱 In the Telegram app, open **your new bot** and send it any message (e.g. "hi").
+   *This step matters — the next one only works after your bot has received a message.*
+2. In your **browser**, go to the address below, replacing `<YOUR_BOT_TOKEN>` with the token
+   from step (c) — keep the word `bot` directly in front of it:
+   `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+   So it ends up looking like `https://api.telegram.org/bot8845113781:AAH.../getUpdates`.
+3. The page shows some text (JSON). Find `"chat":{"id":123456789,` — the number after
+   `"id":` is your chat ID (just digits, occasionally with a leading `-`).
+4. If it shows `{"ok":true,"result":[]}` (empty), you haven't messaged the bot yet — do
+   step 1, then refresh the page.
 
 **e) Google Calendar link** *(optional)* — to fold in personal events.
 - In your browser at [Google Calendar](https://calendar.google.com) → hover your calendar →
