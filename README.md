@@ -187,7 +187,13 @@ section. Send times are the cron in [`.github/workflows/daily.yml`](.github/work
 plus the tolerant window in [`canvas_agent/run.py`](canvas_agent/run.py).
 
 **Seating charts** are MBA-specific and optional — set `SEATING_STREAM` to your stream
-(e.g. `Stream C`) to enable them; leave it blank and everything else still works.
+(e.g. `Stream E`) to enable them; leave it blank and everything else still works.
+
+**Not a coder?** You don't have to hand-edit anything. Point an AI coding tool at your
+copy — [Claude Code](https://www.anthropic.com/claude-code), Cursor, GitHub Copilot, etc.
+— and just describe what you want ("add a gym-class reminder", "change the send time to
+7am", "put weather at the bottom"). It'll make the edit for you. This whole project was
+built that way. 🙂
 
 ## Optional: run it on your laptop
 
@@ -212,8 +218,18 @@ makes it reliable.
 
 GitHub cron runs in UTC and can fire over an hour late, so the workflow uses a tolerant
 London window plus a per-day cache marker (and `concurrency`) to send each brief **once**
-even across the two DST-bracket crons. A monthly keep-alive commit stops GitHub
-auto-disabling the schedule after 60 days of repo inactivity.
+even across the two DST-bracket crons.
+
+**Keep-alive:** GitHub automatically switches off a repo's scheduled workflows after
+**60 days with no commits** — and setting secrets or running the bot don't count as
+commits. So this template ships with a second workflow,
+[`.github/workflows/keepalive.yml`](.github/workflows/keepalive.yml), that makes one tiny
+commit a month to reset that clock. **You get it automatically when you use the template**,
+running in your own repo — nothing to set up. It's why your briefs keep coming without you
+ever touching the repo. You'll see a monthly `chore: keep-alive` commit in your history;
+that's expected. If you'd rather not have it, delete that file — just know you may then
+need to re-enable the schedule (Actions tab → **Enable workflow**) if it ever goes quiet
+for two months.
 
 ## Security & privacy
 
