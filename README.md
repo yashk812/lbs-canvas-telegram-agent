@@ -127,10 +127,13 @@ values into a notes app. Each is a secret — don't share or post them.
    from step (c) — keep the word `bot` directly in front of it:
    `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
    So it ends up looking like `https://api.telegram.org/bot8845113781:AAH.../getUpdates`.
+   ⚠️ Make sure there are **no spaces** anywhere in the token — copy-paste sometimes slips
+   one in (it appears as `%20` in the address bar) and a single space breaks it.
 3. The page shows some text (JSON). Find `"chat":{"id":123456789,` — the number after
    `"id":` is your chat ID (just digits, occasionally with a leading `-`).
 4. If it shows `{"ok":true,"result":[]}` (empty), you haven't messaged the bot yet — do
-   step 1, then refresh the page.
+   step 1, then refresh the page. If it says `Unauthorized` or `404`, the token is wrong
+   (usually a stray space) — re-copy it carefully.
 
 **e) Google Calendar link** *(optional)* — to fold in personal events.
 - In your browser at [Google Calendar](https://calendar.google.com) → hover your calendar →
