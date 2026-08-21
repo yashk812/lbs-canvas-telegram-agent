@@ -98,6 +98,9 @@ Click the green **Use this template** button at the top of this page → **Creat
 repository** → give it a name (e.g. `my-lbs-brief`) → **Create repository**. You now have
 your own copy under your GitHub account.
 
+<img src="docs/images/1-use-template.png" width="720" alt="The Use this template button on the repo page"><br>
+<img src="docs/images/1-create-repo.png" width="720" alt="The Create a new repository form">
+
 ### Step 2 — Collect your keys
 Do these in your **web browser** (except Telegram, which is the **phone app**). Gather the
 values into a notes app. Each is a secret — don't share or post them.
@@ -109,16 +112,23 @@ values into a notes app. Each is a secret — don't share or post them.
 - **Copy it right away** (you can't see it again). Looks like `5886~AbCdEf...` — a number,
   a `~`, then a long string.
 
+<img src="docs/images/2a-canvas-token.png" width="720" alt="Canvas New Access Token button">
+
 **b) LBS calendar link** — your personal timetable feed.
 - Go to the [LBS calendar site](https://lbscalendar.london.edu) → click **More options**
   (the `…`) → **Subscribe** → **copy the link**.
 - Looks like `https://lbscalendar.london.edu/api/student/subscription/xxxxxxxx-...`
+
+<img src="docs/images/2b-subscribe.png" width="720" alt="More Options then Subscribe on the LBS calendar"><br>
+<img src="docs/images/2b-copy-link.png" width="720" alt="Copy the calendar subscription link">
 
 **c) Telegram bot token** — 📱 *in the Telegram phone app*.
 - Install **Telegram** on your phone if you haven't. Open the app → tap the search icon →
   find **[@BotFather](https://t.me/BotFather)** (it has a blue tick).
 - Send it `/newbot` → follow the prompts (a name, then a username ending in `bot`).
 - BotFather replies with a token like `8845113781:AAH9E9...`. Tap it to copy.
+
+<img src="docs/images/2c-botfather.jpeg" width="320" alt="BotFather reply containing your bot token">
 
 **d) Telegram chat ID** — so the bot messages *you*.
 1. 📱 In the Telegram app, open **your new bot** and send it any message (e.g. "hi").
@@ -134,6 +144,8 @@ values into a notes app. Each is a secret — don't share or post them.
 4. If it shows `{"ok":true,"result":[]}` (empty), you haven't messaged the bot yet — do
    step 1, then refresh the page. If it says `Unauthorized` or `404`, the token is wrong
    (usually a stray space) — re-copy it carefully.
+
+<img src="docs/images/2d-getupdates.png" width="720" alt="getUpdates page with the chat id location arrowed">
 
 **e) Google Calendar link** *(optional)* — to fold in personal events.
 - In your browser at [Google Calendar](https://calendar.google.com) → hover your calendar →
@@ -160,6 +172,8 @@ No fiddly list of field names to remember — you paste a single block.
    *Tip: open it in a new browser tab so this guide stays put.* Click **New repository secret**.
 3. **Name:** type `DOTENV`. **Secret:** paste your whole filled-in block. Click **Add secret**.
 
+<img src="docs/images/3-secret.png" width="720" alt="Adding the DOTENV repository secret in Settings">
+
 **Notes:**
 - Fill in only the part **after** each `=`. No quotes, no extra spaces.
 - `SEATING_STREAM` (LBS MBA only): your stream written in full, e.g. `Stream E`. Leave blank
@@ -167,6 +181,9 @@ No fiddly list of field names to remember — you paste a single block.
 - `GOOGLE_CALENDAR_URL` is optional — leave it blank to skip it.
 
 ### Step 4 — Turn it on & check it
+
+<img src="docs/images/4-actions.png" width="720" alt="The Actions tab and the enable-workflows note">
+
 1. Open the **Actions** tab of your repo → if asked, click **"I understand my workflows,
    go ahead and enable them"** (GitHub pauses workflows on new copies by default).
 2. **Check your setup:** click **Check setup** (left) → **Run workflow**. In ~1 minute it
