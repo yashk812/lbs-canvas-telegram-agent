@@ -121,12 +121,12 @@ values into a notes app. Each is a secret — don't share or post them.
 - BotFather replies with a token like `8845113781:AAH9E9...`. Tap it to copy.
 
 **d) Telegram chat ID** — so the bot messages *you*.
-- 📱 In the Telegram app, open your new bot and send it any message (e.g. "hi").
-- Then in your **browser**, open this address — replace `<YOUR_BOT_TOKEN>` with your token,
-  keeping the word `bot` in front:
-  `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
-- On that page find `"chat":{"id":123456789` — that number is your chat ID (just digits,
-  occasionally with a leading `-`).
+- 📱 **Easiest:** in the Telegram app, search **[@userinfobot](https://t.me/userinfobot)**,
+  open it, and tap **Start**. It instantly replies with your numeric **Id** — that's your
+  chat ID (just digits).
+- *Alternative (no extra bot):* message your own bot once, then open
+  `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates` in a browser (replace the token,
+  keep `bot` in front) and find `"chat":{"id":123456789`.
 
 **e) Google Calendar link** *(optional)* — to fold in personal events.
 - In your browser at [Google Calendar](https://calendar.google.com) → hover your calendar →
@@ -159,17 +159,25 @@ No fiddly list of field names to remember — you paste a single block.
   if you're not MBA or don't want seating links.
 - `GOOGLE_CALENDAR_URL` is optional — leave it blank to skip it.
 
-### Step 4 — Turn it on
+### Step 4 — Turn it on & check it
 1. Open the **Actions** tab of your repo → if asked, click **"I understand my workflows,
    go ahead and enable them"** (GitHub pauses workflows on new copies by default).
-2. Click **Daily schedule brief** (left) → **Run workflow** (right) → choose **evening** →
-   **Run workflow**.
-3. Wait ~1 minute, then check Telegram — you should get a brief! 🎉
-
-From now on it runs itself at **6am and 6pm London**, every day, no laptop needed. £0.
+2. **Check your setup:** click **Check setup** (left) → **Run workflow**. In ~1 minute it
+   reports each service and sends a test message to your phone:
+   ```
+   Canvas         ✅  Your Name
+   LBS calendar   ✅  193 events found
+   Telegram bot   ✅  @your_bot
+   Telegram send  ✅  test message sent — check your phone
+   ```
+   Any ❌ tells you exactly what to fix (e.g. "token rejected — check CANVAS_TOKEN"). Edit
+   your `DOTENV` secret and run it again until it's all ✅.
+3. You're done! It now runs automatically at **6am and 6pm London**, every day — no laptop
+   needed. £0. *(To see a full brief right now, run **Daily schedule brief** → **evening**.)*
 
 ### Troubleshooting
-- **No message?** Actions tab → open the latest run → look for a red ✗ and read the error.
+- **Start with "Check setup"** (Actions → **Check setup** → Run workflow) — it pinpoints
+  which service is misconfigured instead of leaving you guessing.
 - **"DOTENV secret not set / incomplete"** → your `DOTENV` secret is missing a required line
   (`CANVAS_TOKEN`, `LBS_CALENDAR_URL`, or the Telegram ones). Edit the secret and re-run.
 - **Wrong values?** Just edit the single `DOTENV` secret (Settings → Secrets → `DOTENV` →

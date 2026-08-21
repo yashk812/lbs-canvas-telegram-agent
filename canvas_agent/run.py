@@ -105,7 +105,12 @@ def main() -> None:
     ap.add_argument("--which", choices=["auto", "morning", "evening"], default="auto")
     ap.add_argument("--date", help="Run-day override YYYY-MM-DD (defaults to today, London)")
     ap.add_argument("--dry-run", action="store_true", help="Print message, do not send")
+    ap.add_argument("--check", action="store_true", help="Validate each service and send a test message")
     args = ap.parse_args()
+
+    if args.check:
+        from . import check
+        raise SystemExit(0 if check.run_checks() else 1)
 
     which = resolve_which(args.which)
     if which is None:
